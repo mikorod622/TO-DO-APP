@@ -26,29 +26,22 @@ const resolvers = {
 
     Mutation: {
         // creates new user and generate token
-        addUser: async (parent, {username, email, password }) => {
+        addUser: async (parent, { username, email, password }) => {
             const user = await User.create({ username, email, password });
             const token = signToken(user);
-            return { token, user }
+            return { token, user };
         },
 
         // logs in and returns a jwt token if password and email are correct 
         // otherwise returns an authentication error
-        login: async (parent, {email, password }) => {
-            const user = await findOne({ email });
+        login: async (parent, { email, password }) => {
+            const user = await User.findOne({ email });
 
-            if (!user) {
-                throw AuthenticationError;
-            }
-
-            const correctPw = await user.isCorrectPassword(password);
-
-            if (!correctPw) {
-                throw AuthenticationError;
+            if (!user || !(await user.isCorrectPassword(password))) {
+                throw new AuthenticationError('Incorrect email or password');
             }
 
             const token = signToken(user);
-
             return { token, user };
         },
 
@@ -63,12 +56,13 @@ const resolvers = {
             return `${task}, task deleted!`;
         },
         // update task
-        updateTask: async (parent, { taskID }) => {
-            const task = await task.findOneAndUpdate(
+        updateTask: async (parent, { taskID, title, description, priority, dueDate }) => {
+            const updatedTask = await Task.findOneAndUpdate(
                 { _id: taskID },
-                { $set: req.body },
+                { $set: { title, description, priority, dueDate } },
                 { runValidators: true, new: true }
             );
+            return updatedTask;
         },
     },
 };

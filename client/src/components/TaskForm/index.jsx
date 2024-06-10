@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
 import { ADD_TASK } from "../../utils/mutations";
 import { QUERY_USER } from "../../utils/queries";
@@ -12,12 +12,26 @@ const TaskForm = () => {
         dueDate: ''
     });
 
+    const [username, setUsername] = useState(null);
+
+    useEffect(() => {
+        const profile = Auth.getProfile();
+        if (profile?.data?.username) {
+            setUsername(profile.data.username);
+        }
+    }, []);
+
     const [addTask, { error }] = useMutation(ADD_TASK, {
-        refetchQueries: [{ query: QUERY_USER, variables: { username: Auth.getProfile().data.username } }],
+        refetchQueries: username ? [{ query: QUERY_USER, variables: { username } }] : [],
     });
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
+
+        if (!username) {
+            console.error("Username is not defined");
+            return;
+        }
 
         try {
             await addTask({
@@ -36,8 +50,14 @@ const TaskForm = () => {
                 dueDate: '',
                 priority: ''
             });
-        } catch (error) {
-            console.error(error);
+        } catch (err) {
+            console.error("Error adding task:", err);
+            if (err.graphQLErrors) {
+                console.error("GraphQL Errors:", err.graphQLErrors);
+            }
+            if (err.networkError) {
+                console.error("Network Error:", err.networkError);
+            }
         }
     };
 

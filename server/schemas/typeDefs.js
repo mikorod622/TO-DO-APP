@@ -39,7 +39,7 @@ type Mutation {
 
     addUser(username: String!, email: String!, password: String!): AuthPayload
 
-    login(emial: String!, password: String!): AuthPayload
+    login(email: String!, password: String!): AuthPayload
 
     addTask(title: String!, description: String, dueDate: String, priority: String): Task
 

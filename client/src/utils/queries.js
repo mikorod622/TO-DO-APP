@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-// retrieve user by username alog with its tasks
+// retrieve user by username along with its tasks
 export const QUERY_USER = gql`
     query user($username: String!) {
         user(username: $username) {
@@ -18,30 +18,28 @@ export const QUERY_USER = gql`
     }
 `;
 
-// retrieve all tasks(I think we are not gonna need it)
+// retrieve all tasks (not used currently)
 export const QUERY_TASKS = gql`
-query getTasks {
-    tasks {
-        _id
-        title
-        description
-        dueDate
-        priority
-         
-    }
-}
-`;
-
-// retrieve a single task
-export const QUERY_SINGLE_TASK = `
-    query getSingleTask($taskId: ID!) {
-        task(taskId: $taskID) {
+    query getTasks {
+        tasks {
             _id
             title
             description
             dueDate
             priority
-            
         }
     }
-`
+`;
+
+// retrieve a single task
+export const QUERY_SINGLE_TASK = gql`
+    query getSingleTask($taskId: ID!) {
+        task(taskId: $taskId) {
+            _id
+            title
+            description
+            dueDate
+            priority
+        }
+    }
+`;
